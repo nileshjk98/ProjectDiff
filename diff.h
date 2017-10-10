@@ -17,20 +17,14 @@ typedef struct file2 {
 	int *toinslines;
 }file2;
 
-enum {
+typedef enum bool {
 	false, true 
-};
-typedef int bool;
-/*
-bool ignore_space_change = false;
-bool recursive_dir_diff = false;
-bool context_format = false;
-bool side_by_side = false;
-bool normal_diff = true;
-bool expand_tabs = false;
-bool ignore_case = false;
-bool ignore_all_space = false;
-*/
+}bool;
+
 int lineseparator(char *filename, char **lines);
 int shortestpath(file1 *f1, file2 *f2);
 void normaldiff(file1 *f1, file2 *f2);
+void strlwr(char *str);
+void ignorespace(file1 *f1, file2 *f2);
+void ignorespchange(file1 *f1, file2 *f2);
+void ignorecase(file1 *f1, file2 *f2);
