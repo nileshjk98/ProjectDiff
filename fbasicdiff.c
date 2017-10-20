@@ -46,6 +46,11 @@ int main(int argc, char * const argv[]) {
 	const char *optlist;
 	char c, ch1, ch2;
 	optlist = "rytiwb";
+	
+	if(argc < 3) {
+		printf("mydiff: missing operand\n");
+		exit(-1);
+	}
 
 	ignore_space_change = false;
 	recursive_dir_diff = false;
