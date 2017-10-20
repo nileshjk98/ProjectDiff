@@ -10,10 +10,11 @@
  */
 void backtrack(int max, int x, int y, int d, int (*trace)[2 * max + 1], file1* f1, file2* f2) {
 	int prevx, prevy, prevk;
-	int k, i = d, *v;
+	int k, i = d, *v, j = 0;
 	f1->dellines = (int *)calloc(f1->nol, sizeof(int));
 	f1->inslines = (int *)calloc(f1->nol + 1, sizeof(int));
 	f2->toinslines = (int *)calloc(f2->nol, sizeof(int));
+	f1->matchlines = (int *)calloc(f1->nol, sizeof(int));
 	for(d = i; d > 0; d--) {
 		k = x - y;
 		v = &trace[d - 1][d - 1];
@@ -38,6 +39,15 @@ void backtrack(int max, int x, int y, int d, int (*trace)[2 * max + 1], file1* f
 		}
 		x = prevx;
 		y = prevy;
+	}
+	for(i = 0; i < f1->nol; i++) {
+		if(f1->dellines[i] == 0) {
+			j = 0;
+			while(strcmp(f1->lines[i], f2->lines[j]) != 0) {
+				j++;
+			}
+			f1->matchlines[i] = j;
+		}
 	}
 	if(sidebyside == true)
 		side_by_side(f1, f2);
