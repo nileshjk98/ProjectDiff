@@ -18,6 +18,7 @@ typedef struct file1 {
 	int nol;
 	char *lines[MAX];
 	int *dellines;
+	int *matchlines;
 	int *inslines;
 }file1;
 
