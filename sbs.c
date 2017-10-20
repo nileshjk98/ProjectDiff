@@ -10,13 +10,13 @@
  *
  */
 void side_by_side(file1 *f1, file2 *f2) {
-	int i = 0, j, k = 0, l, temp;
+	int i = 0, j, k = 0, l, temp, m = 0;
 	lineseparator(f1->filename, f1->lines);
 	lineseparator(f2->filename, f2->lines);
 	expandtabs(f1, f2);
 	for(i = 0; i <= f1->nol; i++) {
 		if(i != f1->nol && f1->dellines[i] == 0) {
-			printf("%-61.61s   %-61.61s\n", f1->lines[i], f1->lines[i]);
+			printf("%-61.61s   %-61.61s\n", f1->lines[i], f2->lines[f1->matchlines[i]]);
 		}
 		if(i != f1->nol && f1->dellines[i] == 1) {
 			j = i;
