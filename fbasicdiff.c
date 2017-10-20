@@ -8,71 +8,129 @@
 #include<errno.h>
 #include "diff.h"
 
+/*
+ * In main function, arguments are separated and
+ * list of options are separated from filenames or directory names
+ * Other arguments are identified i.e it is checked if we 
+ * intend to find diff of directories or files and these arguments are passed
+ * to the corresponding functions for next operations
+ * Error checking i.e whether filenames or directory names are valid or not is also done 
+ * in main
+ * 
+ * normal diff output gives difference in terms of deletions and insertions
+ * I have not implemented 'replace' i.e. change which is basically same as deleting first 
+ * and then appending at that location in first file
+ * The output produced by this program can be used directly to patch two files
+ * using linux patch command as it basically produces output in same format as existing diff
+ * Hence I have not implemented patch command separately
+ *
+ * Options implemented currently include 
+ * -r : recursive directory comparison
+ * -y : side by side output format
+ * -t : expand tabs to correct number of spaces
+ * -b : ignores space change i.e. trailing spaces at the end or converts a sequence of 
+ *  	spaces into a single space
+ * -w : ignores all white space characters 	
+ * -i : ignores case
+ *
+ *  The above options can be combined also
+ *
+ */
+
 int main(int argc, char * const argv[]) {
-	int i = 0, j = 0, m, n, d, count = 0;
+	int i = 0, j = 0, m, n, d, count = 0, flag = 0, flags = 0;
 	file1 f1;
 	file2 f2;
+	dir1 d1;
+	dir2 d2;
 	const char *optlist;
-	char c;
-	optlist = "rcytiw";
+	char c, ch1, ch2;
+	optlist = "rytiwb";
 
-	bool ignore_space_change = false;
-	bool recursive_dir_diff = false;
-	bool context_format = false;
-	bool side_by_side = false;
-	bool normal_diff = true;
-	bool expand_tabs = false;
-	bool ignore_case = false;
-	bool ignore_all_space = false;
+	ignore_space_change = false;
+	recursive_dir_diff = false;
+	sidebyside = false;
+	normal_diff = true;
+	expand_tabs = false;
+	ignore_case = false;
+	ignore_all_space = false;
 
-	f1.filename = argv[argc - 2];
-	f2.filename = argv[argc - 1];
-	f1.fd = open(f1.filename, O_RDONLY);
-	if(f1.fd == -1) {
-		printf("mydiff: %s: No such file or directory\n", f1.filename);
-		return errno;
-	}
-	f2.fd = open(f2.filename, O_RDONLY);
-	if(f2.fd == -1) {
-		printf("mydiff: %s: No such file or directory\n", f2.filename);
-		return errno;
-	}
-	f1.nol = lineseparator(f1.filename, f1.lines);
-	f2.nol = lineseparator(f2.filename, f2.lines);
-	for(i = 0; i < f1.nol; i++) {
-		//printf("%s\n", f1.lines[i]);
-	}
-	for(i = 0; i < f2.nol; i++) {
-		//printf("%s\n", f2.lines[i]);
-	}
 	while((c = getopt(argc, argv, optlist)) != -1) {
 		switch(c) {
 			case 'r' : recursive_dir_diff = true;
 					   break;
-			case 'c' : context_format = true;
-					   break;
-			case 'y' : if(context_format != true) { 
-					   		side_by_side = true;
-						   count++;
-					   }
-					   else {
-					   }
+			case 'y' : sidebyside = true;
 					   break;
 			case 't' : expand_tabs = true;
 					   break;
 			case 'i' : ignore_case = true;
-					   ignorecase(&f1, &f2);	
 					   break;
 			case 'w' : ignore_all_space = true;
-					   ignorespace(&f1, &f2);
+					   break;
+			case 'b' : ignore_space_change = true;
 					   break;
 			case '?' : break;
 		}
-				   
 	}
-	d = shortestpath(&f1, &f2);
-	//printf("Shortest number of edits %d\n", d);
+
+	d1.dirname = argv[argc - 2];
+	d1.dd = opendir(d1.dirname);
+	if(d1.dd == NULL) {
+		f1.filename = argv[argc - 2];
+		f2.filename = argv[argc - 1];
+		f1.fd = open(f1.filename, O_RDONLY);
+		if(f1.fd == -1) {
+			printf("mydiff: %s: No such file or directory\n", f1.filename);
+			return errno;
+		}
+		while(read(f1.fd, &ch1, 1)) {
+			if(ch1 == '\0') {
+				flag = 1;
+				break;
+			}
+		}
+		close(f1.fd);
+		f2.fd = open(f2.filename, O_RDONLY);
+		f1.fd = open(f1.filename, O_RDONLY);
+		if(f2.fd == -1) {
+			printf("mydiff: %s: No such file or directory\n", f2.filename);
+			return errno;
+		}
+		while(flag == 1 && read(f2.fd, &ch2, 1) && read(f1.fd, &ch1, 1))  {
+			if(ch1 != ch2) {
+				flags = 1;
+				break;
+			}
+		}
+		if(flags == 1) {
+			printf("Binary files %s and %s differ\n", f1.filename, f2.filename);
+			exit(-1);
+		}
+		else if(flag == 1 && flags == 0) {
+			exit(-1);
+		}
+		f1.nol = lineseparator(f1.filename, f1.lines);
+		f2.nol = lineseparator(f2.filename, f2.lines);
+		d = shortestpath(&f1, &f2);
+	}
+	else {
+		d2.dirname = argv[argc - 1];
+		d2.dd = opendir(d2.dirname);
+		if(d2.dd == NULL) { 
+			perror("");
+			return errno;
+		}
+		recdirdiff(&d1, &d2);
+	}
 }
+
+/*
+ * Takes two arguments filename and array of pointers to strings
+ * Separates the lines in the file in the array of pointers to strings
+ * returns the number of lines in the file
+ *
+ */
+
 int lineseparator(char *filename, char **lines) {
 	int m, i = 0, j = 0, fd;
 	char ch, templine[1024];
