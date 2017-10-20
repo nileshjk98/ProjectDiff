@@ -1,6 +1,10 @@
 #include<string.h>
 #include<stdlib.h>
 #include "diff.h"
+/* 
+ * Converts string into lowercase characters
+ *
+ */
 void strlwr(char *str) {
 	int i;
 	for(i = 0; str[i] != '\0'; i++) {
@@ -9,6 +13,11 @@ void strlwr(char *str) {
 		}
 	}
 }
+/* 
+ * Ignores all whitespace characters
+ * It removes all the spaces between the lines
+ *
+ */
 void ignorespace(file1 *f1, file2 *f2) {
 	char str[1024];
 	int i, j, k = 0;
@@ -35,6 +44,11 @@ void ignorespace(file1 *f1, file2 *f2) {
 		k = 0;
 	}
 }
+/* 
+ * Ignores space change
+ * It converts sequence of whitespace characters into a single whitespace character
+ *
+ */
 void ignorespchange(file1 *f1, file2 *f2) {
 	int i, j, k = 0;
 	char str[1024], prev;
@@ -80,6 +94,11 @@ void ignorespchange(file1 *f1, file2 *f2) {
 	}
 
 }
+/* 
+ * Ignores case change 
+ * Converts all the characters in all the lines to lowercase and then compares
+ *
+ */
 void ignorecase(file1 *f1, file2* f2) {
 	int i;
 	for(i = 0; i < f1->nol; i++) {
