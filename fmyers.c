@@ -3,6 +3,11 @@
 #include<string.h>
 #include "diff.h"
 
+/* 
+ * This backtracks through the x values in the graph created by shortestpath 
+ * to identify and represent the shortest path and passes this data normaldiff function
+ *
+ */
 void backtrack(int max, int x, int y, int d, int (*trace)[2 * max + 1], file1* f1, file2* f2) {
 	int prevx, prevy, prevk;
 	int k, i = d, *v;
@@ -19,12 +24,10 @@ void backtrack(int max, int x, int y, int d, int (*trace)[2 * max + 1], file1* f
 		prevx = v[prevk];
 		prevy = prevx - prevk;
 		while(x > prevx && y > prevy) {
-			//printf("(%d,%d)->(%d, %d)\n", x - 1, y - 1, x, y);
 			x--;
 			y--;
 		}
 		if(d > 0) {
-			//printf("(%d,%d)->(%d, %d)\n", prevx, prevy, x, y);
 			if(x > prevx && y == prevy) {
 				f1->dellines[prevx] = 1;
 			}
@@ -36,25 +39,10 @@ void backtrack(int max, int x, int y, int d, int (*trace)[2 * max + 1], file1* f
 		x = prevx;
 		y = prevy;
 	}
-	/*printf("Lines to be deleted\n");
-	for(i = 0; i < f1->nol; i++) {
-		if(f1->dellines[i] == 1) {
-			printf("%d %s\n", i, f1->lines[i]);
-		}
-	}
-	printf("Lines to be inserted at position\n");
-	for(i = 0; i <= f1->nol; i++) {
-		if(f1->inslines[i] > 0) {
-			printf("%d %d\n", i, f1->inslines[i]);
-		}
-	}
-	printf("Lines to be inserted\n");
-	for(i = 0; i < f2->nol; i++) {
-		if(f2->toinslines[i] == 1) {
-			printf("%d %s\n", i, f2->lines[i]);
-		}
-	}*/
-	normaldiff(f1, f2);
+	if(sidebyside == true)
+		side_by_side(f1, f2);
+	else
+		normaldiff(f1, f2);
 }
 /*
  * This function uses graph search to find minimum number of edits i.e 
@@ -65,6 +53,14 @@ int shortestpath(file1* f1, file2* f2) {
 	int d, i, k, x, y, result, j;
 	int max = f1->nol + f2->nol;
 	int *v, trace[max + 1][2 * max + 1], *temp;
+	if(ignore_case == true) 
+		ignorecase(f1, f2);
+	if(ignore_all_space == true) 
+		ignorespace(f1, f2);
+	else if(ignore_all_space == false && ignore_space_change == true) 
+		ignorespchange(f1, f2);
+	if(expand_tabs == true)
+		expandtabs(f1, f2);
 	temp = (int *)malloc((2 * max + 1) * sizeof(int));
 	for(i = 0; i < 2 * max + 1; i++) {
 		temp[i] = 0;
@@ -80,11 +76,9 @@ int shortestpath(file1* f1, file2* f2) {
 			//start point
 			xstart = v[kprev];
 			ystart = xstart - kprev;
-			//printf("\n%d %d\n", xstart, ystart);
 			// mid point
 			xmid = down ? xstart : xstart + 1;
 			ymid = xmid - k;
-			//printf("\n%d %d\n", xmid, ymid);
 
 			// end point
 			xend = xmid;
@@ -113,14 +107,21 @@ int shortestpath(file1* f1, file2* f2) {
 		}
 	}
 }
+ 
+/*
+ * Produces output in normal diff format except change statement
+ * Uses only delete and append to represent the output
+ * This output can be used to patch the two files using patch command
+ *
+ */
+
 void normaldiff(file1 *f1, file2 *f2) {
-	int i = 0, countd = 0, j, k = 0, l, temp;
+	int i = 0, j, k = 0, l, temp;
 	for(i = 0; i <= f1->nol; i++) {
 		if(i != f1->nol && f1->dellines[i] == 1) {
 			j = i;
 			while(j < f1->nol && f1->dellines[j] == 1) {
 				j++;
-				countd++;
 			}
 			if(i + 1 == j)
 				printf("%dd%d\n", i + 1, i);
@@ -133,7 +134,6 @@ void normaldiff(file1 *f1, file2 *f2) {
 			i--;
 		}
 		if(f1->inslines[i] > 0) {
-			//printf("Inside Insertion\n");
 			for(; k < f2->nol; k++) {
 				if(f2->toinslines[k] == 1) {
 					l = 0;
