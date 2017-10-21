@@ -171,7 +171,7 @@ void normaldiff(file1 *f1, file2 *f2) {
 					else 
 						printf("%da%d,%d\n", i, k + 1, k + l);
 					temp = k;
-					lineseparator(f1->filename, f1->lines);
+					lineseparator(f2->filename, f2->lines);
 					for(;k < temp + l; k++) {
 						printf("> %s\n", f2->lines[k]);
 					}
