@@ -8,16 +8,32 @@
  * to identify and represent the shortest path and passes this data normaldiff function
  *
  */
-void backtrack(int max, int x, int y, int d, int (*trace)[2 * max + 1], file1* f1, file2* f2) {
+void backtrack(int max, int x, int y, int d, int *trace, file1* f1, file2* f2) {
 	int prevx, prevy, prevk;
 	int k, i = d, *v, j = 0;
 	f1->dellines = (int *)calloc(f1->nol, sizeof(int));
+	if(f1->dellines == NULL) {
+		printf("calloc failed\n");
+		exit(-1);
+	}
 	f1->inslines = (int *)calloc(f1->nol + 1, sizeof(int));
+	if(f1->inslines == NULL) {
+		printf("calloc failed\n");
+		exit(-1);
+	}
 	f2->toinslines = (int *)calloc(f2->nol, sizeof(int));
+	if(f2->toinslines == NULL) {
+		printf("calloc failed\n");
+		exit(-1);
+	}
 	f1->matchlines = (int *)calloc(f1->nol, sizeof(int));
+	if(f1->matchlines == NULL) {
+		printf("calloc failed\n");
+		exit(-1);
+	}
 	for(d = i; d > 0; d--) {
 		k = x - y;
-		v = &trace[d - 1][d - 1];
+		v = trace + (d - 1) * (max + 1) + d - 1;
 		if(k == -d || (k != d && v[k - 1] < v[k + 1]))
 			prevk = k + 1;
 		else 	
@@ -64,7 +80,9 @@ void backtrack(int max, int x, int y, int d, int (*trace)[2 * max + 1], file1* f
 int shortestpath(file1* f1, file2* f2) {
 	int d, i, k, x, y, result, j;
 	int max = f1->nol + f2->nol;
-	int *v, trace[max + 1][2 * max + 1], *temp;
+	int *v, *trace, *temp;
+	int down, kprev, xmid, xstart, ystart, ymid, xend, yend;
+	trace = (int *)malloc(sizeof(int) * (max + 1) * (2 * max + 1));
 	if(ignore_case == true) 
 		ignorecase(f1, f2);
 	if(ignore_all_space == true) 
@@ -79,7 +97,6 @@ int shortestpath(file1* f1, file2* f2) {
 	}
 	v = &temp[max];
 	v[1] = 0;
-	int down, kprev, xmid, xstart, ystart, ymid, xend, yend;
 	for(d = 0; d <= max; d++) {
 		for(k = -d; k <= d; k += 2) {
 			down = (k == -d || (k != d && v[k - 1] < v[k + 1]));
@@ -95,7 +112,6 @@ int shortestpath(file1* f1, file2* f2) {
 			// end point
 			xend = xmid;
 			yend = ymid;
-			//printf("\n%d %d\n", xend, yend);
 
 			// follow diagonal
 			while(xend < f1->nol && yend < f2->nol && (result = strcmp(f1->lines[xend], f2->lines[yend]) == 0)) {
@@ -107,10 +123,8 @@ int shortestpath(file1* f1, file2* f2) {
 			v[k] = xend;
 
 			for(i = 0; i < 2 * d + 1; i++) {
-				trace[d][i] = v[i - d];
-				//printf("%d ", trace[d][i]);
+				*(trace + d * (max + 1) + i) = v[i - d];
 			}
-			//printf("\n");
 			// check for solution
 			if(xend >= f1->nol && yend >= f2->nol) /* solution has been found */ {
 				backtrack(max, xend, yend, d, trace, f1, f2);
