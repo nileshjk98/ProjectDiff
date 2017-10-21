@@ -7,6 +7,7 @@
  * nol is number of lines
  * dellines is pointer to array that stores 0 if the line is
  * repeated in second file and 1 if it is not 
+ * matchlines stores the position of matching line in second line
  * inslines is also pointer to array that stores the number of
  * lines to be inserted from file 2 in file1 at that particular index
  *
@@ -103,3 +104,4 @@ void expandtabs(file1 *f1, file2 *f2);
 void recdirdiff(dir1 *d1, dir2 *d2);
 int dirshortestpath(dir1 *d1, dir2 *d2);
 int isdir(dir1 *d1, int i);
+void contextformat(file1 *f1, file2 *f2); 
