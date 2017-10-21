@@ -49,7 +49,9 @@ void backtrack(int max, int x, int y, int d, int (*trace)[2 * max + 1], file1* f
 			f1->matchlines[i] = j;
 		}
 	}
-	if(sidebyside == true)
+	if(context_format == true)
+		contextformat(f1, f2);
+	else if(sidebyside == true)
 		side_by_side(f1, f2);
 	else
 		normaldiff(f1, f2);
