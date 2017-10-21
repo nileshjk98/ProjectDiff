@@ -26,6 +26,7 @@
  *
  * Options implemented currently include 
  * -r : recursive directory comparison
+ * -c : context format output 
  * -y : side by side output format
  * -t : expand tabs to correct number of spaces
  * -b : ignores space change i.e. trailing spaces at the end or converts a sequence of 
@@ -45,7 +46,7 @@ int main(int argc, char * const argv[]) {
 	dir2 d2;
 	const char *optlist;
 	char c, ch1, ch2;
-	optlist = "rytiwb";
+	optlist = "rcytiwb";
 	
 	if(argc < 3) {
 		printf("mydiff: missing operand\n");
@@ -59,12 +60,25 @@ int main(int argc, char * const argv[]) {
 	expand_tabs = false;
 	ignore_case = false;
 	ignore_all_space = false;
+	context_format = false;
 
 	while((c = getopt(argc, argv, optlist)) != -1) {
 		switch(c) {
 			case 'r' : recursive_dir_diff = true;
 					   break;
-			case 'y' : sidebyside = true;
+			case 'y' : if(context_format == false)
+						   sidebyside = true;
+					   else { 
+						   printf("mydiff: conflicting output style options\n");
+						   exit(-1);
+					   }
+					   break;
+			case 'c' : if(sidebyside == false)
+						   context_format = true;
+					   else { 
+						   printf("mydiff: conflicting output style options\n");
+						   exit(-1);
+					   }
 					   break;
 			case 't' : expand_tabs = true;
 					   break;
