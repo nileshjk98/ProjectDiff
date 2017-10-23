@@ -8,9 +8,9 @@
  * to identify and represent the shortest path and passes this data normaldiff function
  *
  */
-void backtrack(int max, int x, int y, int d, int *trace, file1* f1, file2* f2) {
+void backtrack(int maxop, int x, int y, int d, int *trace, file1* f1, file2* f2) {
 	int prevx, prevy, prevk;
-	int k, i = d, *v, j = 0;
+	int k, i = d, *vertices, j = 0;
 	f1->dellines = (int *)calloc(f1->nol, sizeof(int));
 	if(f1->dellines == NULL) {
 		printf("calloc failed\n");
@@ -33,12 +33,12 @@ void backtrack(int max, int x, int y, int d, int *trace, file1* f1, file2* f2) {
 	}
 	for(d = i; d > 0; d--) {
 		k = x - y;
-		v = trace + (d - 1) * (max + 1) + d - 1;
-		if(k == -d || (k != d && v[k - 1] < v[k + 1]))
+		vertices = trace + (d - 1) * (maxop + 1) + d - 1;
+		if(k == -d || (k != d && vertices[k - 1] < vertices[k + 1]))
 			prevk = k + 1;
 		else 	
 			prevk = k - 1;
-		prevx = v[prevk];
+		prevx = vertices[prevk];
 		prevy = prevx - prevk;
 		while(x > prevx && y > prevy) {
 			x--;
@@ -79,10 +79,10 @@ void backtrack(int max, int x, int y, int d, int *trace, file1* f1, file2* f2) {
  */
 int shortestpath(file1* f1, file2* f2) {
 	int d, i, k, x, y, result, j;
-	int max = f1->nol + f2->nol;
-	int *v, *trace, *temp;
-	int down, kprev, xmid, xstart, ystart, ymid, xend, yend;
-	trace = (int *)malloc(sizeof(int) * (max + 1) * (2 * max + 1));
+	int maxop = f1->nol + f2->nol;
+	int *vertices, *trace, *temp;
+	int dmove, kprev, xmid, xstart, ystart, ymid, xend, yend;
+	trace = (int *)malloc(sizeof(int) * (maxop + 1) * (2 * maxop + 1));
 	if(ignore_case == true) 
 		ignorecase(f1, f2);
 	if(ignore_all_space == true) 
@@ -91,43 +91,44 @@ int shortestpath(file1* f1, file2* f2) {
 		ignorespchange(f1, f2);
 	if(expand_tabs == true)
 		expandtabs(f1, f2);
-	temp = (int *)malloc((2 * max + 1) * sizeof(int));
-	for(i = 0; i < 2 * max + 1; i++) {
+	temp = (int *)malloc((2 * maxop + 1) * sizeof(int));
+	for(i = 0; i < 2 * maxop + 1; i++) {
 		temp[i] = 0;
 	}
-	v = &temp[max];
-	v[1] = 0;
-	for(d = 0; d <= max; d++) {
+	vertices = &temp[maxop];
+	vertices[1] = 0;
+	for(d = 0; d <= maxop; d++) {
 		for(k = -d; k <= d; k += 2) {
-			down = (k == -d || (k != d && v[k - 1] < v[k + 1]));
-			kprev = down ? k + 1 : k - 1;
+			//dmove = (k == -d || (k != d && vertices[k - 1] < vertices[k + 1]));
+			if(k == -d) 
+				dmove = 1;
+			else if(k != d && vertices[k - 1] < vertices[k + 1]) 
+				dmove = 1;
+			else 
+				dmove = 0;
+			kprev = dmove ? k + 1 : k - 1;
 
-			//start point
-			xstart = v[kprev];
+			xstart = vertices[kprev];
 			ystart = xstart - kprev;
-			// mid point
-			xmid = down ? xstart : xstart + 1;
+
+			xmid = dmove ? xstart : xstart + 1;
 			ymid = xmid - k;
 
-			// end point
 			xend = xmid;
 			yend = ymid;
 
-			// follow diagonal
 			while(xend < f1->nol && yend < f2->nol && (result = strcmp(f1->lines[xend], f2->lines[yend]) == 0)) {
 				xend++;
 				yend++;
 			}
 
-			// save end point
-			v[k] = xend;
+			vertices[k] = xend;
 
 			for(i = 0; i < 2 * d + 1; i++) {
-				*(trace + d * (max + 1) + i) = v[i - d];
+				*(trace + d * (maxop + 1) + i) = vertices[i - d];
 			}
-			// check for solution
-			if(xend >= f1->nol && yend >= f2->nol) /* solution has been found */ {
-				backtrack(max, xend, yend, d, trace, f1, f2);
+			if(xend >= f1->nol && yend >= f2->nol) {
+				backtrack(maxop, xend, yend, d, trace, f1, f2);
 				return d;
 			}
 		}
