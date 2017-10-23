@@ -165,20 +165,20 @@ void normaldirdiff(dir1 *d1, dir2 *d2) {
  * and passes that data to normaldirdiff
  * 
  */
-void dirbacktrack(int max, int x, int y, int d, int (*trace)[2 * max + 1], dir1* d1, dir2* d2) {
+void dirbacktrack(int maxop, int x, int y, int d, int *trace, dir1* d1, dir2* d2) {
 	int prevx, prevy, prevk;
-	int k, i = d, *v;
+	int k, i = d, *vertices;
 	d1->delfiles = (int *)calloc(d1->noe, sizeof(int));
 	d1->insfiles = (int *)calloc(d1->noe + 1, sizeof(int));
 	d2->toinsfiles = (int *)calloc(d2->noe, sizeof(int));
 	for(d = i; d > 0; d--) {
 		k = x - y;
-		v = &trace[d - 1][d - 1];
-		if(k == -d || (k != d && v[k - 1] < v[k + 1]))
+		vertices = trace + (d - 1) * (maxop + 1) + d - 1;
+		if(k == -d || (k != d && vertices[k - 1] < vertices[k + 1]))
 			prevk = k + 1;
 		else 	
 			prevk = k - 1;
-		prevx = v[prevk];
+		prevx = vertices[prevk];
 		prevy = prevx - prevk;
 		while(x > prevx && y > prevy) {
 			x--;
@@ -205,48 +205,49 @@ void dirbacktrack(int max, int x, int y, int d, int (*trace)[2 * max + 1], dir1*
  */
 int dirshortestpath(dir1* d1, dir2* d2) {
 	int d, i, k, x, y, result, j;
-	int max = d1->noe + d2->noe;
-	int *v, trace[max + 1][2 * max + 1], *temp;
-	temp = (int *)malloc((2 * max + 1) * sizeof(int));
-	for(i = 0; i < 2 * max + 1; i++) {
+	int maxop = d1->noe + d2->noe;
+	int *vertices, *trace, *temp;
+	trace = (int *)malloc(sizeof(int) * (maxop + 1) * (2 * maxop + 1));
+	temp = (int *)malloc((2 * maxop + 1) * sizeof(int));
+	for(i = 0; i < 2 * maxop + 1; i++) {
 		temp[i] = 0;
 	}
-	v = &temp[max];
-	v[1] = 0;
-	int down, kprev, xmid, xstart, ystart, ymid, xend, yend;
-	for(d = 0; d <= max; d++) {
+	vertices = &temp[maxop];
+	vertices[1] = 0;
+	int dmove, kprev, xmid, xstart, ystart, ymid, xend, yend;
+	for(d = 0; d <= maxop; d++) {
 		for(k = -d; k <= d; k += 2) {
-			down = (k == -d || (k != d && v[k - 1] < v[k + 1]));
-			kprev = down ? k + 1 : k - 1;
+			if(k == -d) 
+				dmove = 1;
+			else if(k != d && vertices[k - 1] < vertices[k + 1]) 
+				dmove = 1;
+			else 
+				dmove = 0;
 
-			//start point
-			xstart = v[kprev];
+			kprev = dmove ? k + 1 : k - 1;
+
+			xstart = vertices[kprev];
 			ystart = xstart - kprev;
 
-			// mid point
-			xmid = down ? xstart : xstart + 1;
+			xmid = dmove ? xstart : xstart + 1;
 			ymid = xmid - k;
 
-			// end point
 			xend = xmid;
 			yend = ymid;
 
-			// follow diagonal
 			while(xend < d1->noe && yend < d2->noe && (result = strcmp(d1->names[xend], d2->names[yend]) == 0)) {
 				xend++;
 				yend++;
 			}
 
-			// save end point
-			v[k] = xend;
+			vertices[k] = xend;
 
 			for(i = 0; i < 2 * d + 1; i++) {
-				trace[d][i] = v[i - d];
+				*(trace + d * (maxop + 1) + i) = vertices[i - d];
 			}
 
-			// check for solution
-			if(xend >= d1->noe && yend >= d2->noe) /* solution has been found */ {
-				dirbacktrack(max, xend, yend, d, trace, d1, d2);
+			if(xend >= d1->noe && yend >= d2->noe) {
+				dirbacktrack(maxop, xend, yend, d, trace, d1, d2);
 				return d;
 			}
 		}
