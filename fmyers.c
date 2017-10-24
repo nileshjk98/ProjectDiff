@@ -81,7 +81,7 @@ int shortestpath(file1* f1, file2* f2) {
 	int d, i, k, x, y, result, j;
 	int maxop = f1->nol + f2->nol;
 	int *vertices, *trace, *temp;
-	int dmove, kprev, xmid, xstart, ystart, ymid, xend, yend;
+	int dmove, kprev, xstart, ystart, xend, yend;
 	trace = (int *)malloc(sizeof(int) * (maxop + 1) * (2 * maxop + 1));
 	if(ignore_case == true) 
 		ignorecase(f1, f2);
@@ -99,7 +99,6 @@ int shortestpath(file1* f1, file2* f2) {
 	vertices[1] = 0;
 	for(d = 0; d <= maxop; d++) {
 		for(k = -d; k <= d; k += 2) {
-			//dmove = (k == -d || (k != d && vertices[k - 1] < vertices[k + 1]));
 			if(k == -d) 
 				dmove = 1;
 			else if(k != d && vertices[k - 1] < vertices[k + 1]) 
@@ -107,21 +106,14 @@ int shortestpath(file1* f1, file2* f2) {
 			else 
 				dmove = 0;
 			kprev = dmove ? k + 1 : k - 1;
-
 			xstart = vertices[kprev];
 			ystart = xstart - kprev;
-
-			xmid = dmove ? xstart : xstart + 1;
-			ymid = xmid - k;
-
-			xend = xmid;
-			yend = ymid;
-
+			xend = dmove ? xstart : xstart + 1;
+			yend = xend - k;
 			while(xend < f1->nol && yend < f2->nol && (result = strcmp(f1->lines[xend], f2->lines[yend]) == 0)) {
 				xend++;
 				yend++;
 			}
-
 			vertices[k] = xend;
 
 			for(i = 0; i < 2 * d + 1; i++) {
