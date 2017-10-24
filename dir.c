@@ -198,6 +198,11 @@ void dirbacktrack(int maxop, int x, int y, int d, int *trace, dir1* d1, dir2* d2
 	}
 	normaldirdiff(d1, d2);
 }
+/*int cmp(const void *e1, const void *e2) {
+	const char *e11 = *(const char **)e1;
+	const char *e22 = *(const char **)e2;
+    return strcmp(e11, e22);
+}*/
 /*
  * This function uses graph search to find minimum number of edits i.e 
  * insertions and deletions required to convert directory1 to directory2. 
@@ -209,12 +214,14 @@ int dirshortestpath(dir1* d1, dir2* d2) {
 	int *vertices, *trace, *temp;
 	trace = (int *)malloc(sizeof(int) * (maxop + 1) * (2 * maxop + 1));
 	temp = (int *)malloc((2 * maxop + 1) * sizeof(int));
+	//qsort(d1->names, 1024, sizeof(char *), cmp);
+	//qsort(d2->names, 1024, sizeof(char *), cmp);
 	for(i = 0; i < 2 * maxop + 1; i++) {
 		temp[i] = 0;
 	}
 	vertices = &temp[maxop];
 	vertices[1] = 0;
-	int dmove, kprev, xmid, xstart, ystart, ymid, xend, yend;
+	int dmove, kprev, xstart, ystart, xend, yend;
 	for(d = 0; d <= maxop; d++) {
 		for(k = -d; k <= d; k += 2) {
 			if(k == -d) 
@@ -225,21 +232,14 @@ int dirshortestpath(dir1* d1, dir2* d2) {
 				dmove = 0;
 
 			kprev = dmove ? k + 1 : k - 1;
-
 			xstart = vertices[kprev];
 			ystart = xstart - kprev;
-
-			xmid = dmove ? xstart : xstart + 1;
-			ymid = xmid - k;
-
-			xend = xmid;
-			yend = ymid;
-
+			xend = dmove ? xstart : xstart + 1;
+			yend = xend - k;
 			while(xend < d1->noe && yend < d2->noe && (result = strcmp(d1->names[xend], d2->names[yend]) == 0)) {
 				xend++;
 				yend++;
 			}
-
 			vertices[k] = xend;
 
 			for(i = 0; i < 2 * d + 1; i++) {
