@@ -1,0 +1,6 @@
+1. Myer's Paper : http://www.xmailserver.org/diff2.pdf
+2. Man page of diff, getopt, opendir
+3. Diff Documentation : www.gnu.org/software/diffutils/manual/diffutils.html
+4. The If Works : https://blog.jcoglan.com/2017/02/12/the-myers-diff-algorithm-part-1/
+5. Codeproject : https://www.codeproject.com/Articles/42279/Investigating-Myers-diff-algorithm-Part-of
+6. Diff utility - Wikipedia : https://en.wikipedia.org/wiki/Diff_utility
