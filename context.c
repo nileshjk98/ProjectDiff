@@ -17,8 +17,11 @@ void contextformat(file1 *f1, file2 *f2) {
 	printf("*** %s %s\n", f1->filename, time);
 	stat(f2->filename, &attrib);
 	strftime(time, 100, "%Y-%m-%d %H:%M:%S", localtime(&attrib.st_mtime));
+	printf("--- %s %s\n", f2->filename, time);
 	printf("***************\n");
 	printf("*** %d,%d ****\n", i + 1, f1->nol);
+	lineseparator(f1->filename, f1->lines);
+	lineseparator(f2->filename, f2->lines);
 	for(i = 0 ; i < f1->nol; i++) {
 		if(f1->dellines[i] == 0) {
 			printf("  %s\n", f1->lines[i]);
