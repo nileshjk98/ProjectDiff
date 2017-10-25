@@ -110,11 +110,9 @@ int main(int argc, char *argv[]) {
 			}
 		}
 	}
-	printf("Outside the loop\n");
 	x = 0;
 	y = 0;
 	f = 0;
-	printf("fnol %d\n", fnol);
 	if(a[y].index == 0) {
 		for(i = a[y].start - 1; i < a[y].end; i++) {
 			final[f] = (char *)malloc(strlen(plines[i] + 1));
@@ -131,7 +129,7 @@ int main(int argc, char *argv[]) {
 				f++;
 			}
 		}
-		else if(!(i >= d[x].start - 1 && i < d[x].end)) {
+		if(!(i >= d[x].start - 1 && i < d[x].end)) {
 			final[f] = (char *)malloc(strlen(flines[i]) + 1);
 			strcpy(final[f], flines[i]); 
 			f++;
@@ -141,7 +139,6 @@ int main(int argc, char *argv[]) {
 		if(i >= a[y].index) 
 			y++;
 	}
-	printf("Final\n");
 	i = 0;
 	fd = open(argv[1], O_TRUNC | O_CREAT | O_WRONLY);
 	while(i < f) {
