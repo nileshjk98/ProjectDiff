@@ -1,7 +1,7 @@
 #include<sys/types.h>
 #include<dirent.h>
 
-#define MAX 1024
+#define MAX 2048
 /* 
  * Structure to store file1 data
  * nol is number of lines
