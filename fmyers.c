@@ -10,7 +10,7 @@
  */
 void backtrack(int maxop, int x, int y, int d, int *trace, file1* f1, file2* f2) {
 	int prevx, prevy, prevk;
-	int k, i = d, *vertices, j = 0;
+	int k, i = d, *vertices, j = 0, s = 0, t = 0;
 	f1->dellines = (int *)calloc(f1->nol, sizeof(int));
 	if(f1->dellines == NULL) {
 		printf("calloc failed\n");
@@ -33,7 +33,7 @@ void backtrack(int maxop, int x, int y, int d, int *trace, file1* f1, file2* f2)
 	}
 	for(d = i; d > 0; d--) {
 		k = x - y;
-		vertices = trace + (d - 1) * (maxop + 1) + d - 1;
+		vertices = trace + (d - 1) * (2 * maxop + 1) + d - 1;
 		if(k == -d || (k != d && vertices[k - 1] < vertices[k + 1]))
 			prevk = k + 1;
 		else 	
@@ -44,14 +44,12 @@ void backtrack(int maxop, int x, int y, int d, int *trace, file1* f1, file2* f2)
 			x--;
 			y--;
 		}
-		if(d > 0) {
-			if(x > prevx && y == prevy) {
-				f1->dellines[prevx] = 1;
-			}
-			else if(y > prevy && x == prevx) {
-				f2->toinslines[prevy] = 1;
-				(f1->inslines[prevx])++ ;
-			}
+		if(x > prevx && y == prevy) {
+			f1->dellines[prevx] = 1;
+		}
+		else if(y > prevy && x == prevx) {
+			f2->toinslines[prevy] = 1;
+			(f1->inslines[prevx])++;
 		}
 		x = prevx;
 		y = prevy;
@@ -59,7 +57,7 @@ void backtrack(int maxop, int x, int y, int d, int *trace, file1* f1, file2* f2)
 	for(i = 0; i < f1->nol; i++) {
 		if(f1->dellines[i] == 0) {
 			j = 0;
-			while(strcmp(f1->lines[i], f2->lines[j]) != 0) {
+			while(j < f2->nol && strcmp(f1->lines[i], f2->lines[j]) != 0) {
 				j++;
 			}
 			f1->matchlines[i] = j;
@@ -117,7 +115,7 @@ int shortestpath(file1* f1, file2* f2) {
 			vertices[k] = xend;
 
 			for(i = 0; i < 2 * d + 1; i++) {
-				*(trace + d * (maxop + 1) + i) = vertices[i - d];
+				*(trace + d * (2 * maxop + 1) + i) = vertices[i - d];
 			}
 			if(xend >= f1->nol && yend >= f2->nol) {
 				backtrack(maxop, xend, yend, d, trace, f1, f2);
@@ -136,6 +134,8 @@ int shortestpath(file1* f1, file2* f2) {
 
 void normaldiff(file1 *f1, file2 *f2) {
 	int i = 0, j, k = 0, l, temp;
+	lineseparator(f1->filename, f1->lines);
+	lineseparator(f2->filename, f2->lines);
 	for(i = 0; i <= f1->nol; i++) {
 		if(i != f1->nol && f1->dellines[i] == 1) {
 			j = i;
@@ -146,7 +146,6 @@ void normaldiff(file1 *f1, file2 *f2) {
 				printf("%dd%d\n", i + 1, i);
 			else
 				printf("%d,%dd%d\n", i + 1, j, i);
-			lineseparator(f1->filename, f1->lines);
 			for(;i < j; i++) {
 				printf("< %s\n", f1->lines[i]);
 			}
@@ -164,7 +163,6 @@ void normaldiff(file1 *f1, file2 *f2) {
 					else 
 						printf("%da%d,%d\n", i, k + 1, k + l);
 					temp = k;
-					lineseparator(f2->filename, f2->lines);
 					for(;k < temp + l; k++) {
 						printf("> %s\n", f2->lines[k]);
 					}
