@@ -173,7 +173,7 @@ void dirbacktrack(int maxop, int x, int y, int d, int *trace, dir1* d1, dir2* d2
 	d2->toinsfiles = (int *)calloc(d2->noe, sizeof(int));
 	for(d = i; d > 0; d--) {
 		k = x - y;
-		vertices = trace + (d - 1) * (maxop + 1) + d - 1;
+		vertices = trace + (d - 1) * (2 * maxop + 1) + d - 1;
 		if(k == -d || (k != d && vertices[k - 1] < vertices[k + 1]))
 			prevk = k + 1;
 		else 	
@@ -184,14 +184,12 @@ void dirbacktrack(int maxop, int x, int y, int d, int *trace, dir1* d1, dir2* d2
 			x--;
 			y--;
 		}
-		if(d > 0) {
-			if(x > prevx && y == prevy) {
-				d1->delfiles[prevx] = 1;
-			}
-			else if(y > prevy && x == prevx) {
-				d2->toinsfiles[prevy] = 1;
-				(d1->insfiles[prevx])++ ;
-			}
+		if(x > prevx && y == prevy) {
+			d1->delfiles[prevx] = 1;
+		}
+		else if(y > prevy && x == prevx) {
+			d2->toinsfiles[prevy] = 1;
+			(d1->insfiles[prevx])++ ;
 		}
 		x = prevx;
 		y = prevy;
@@ -243,7 +241,7 @@ int dirshortestpath(dir1* d1, dir2* d2) {
 			vertices[k] = xend;
 
 			for(i = 0; i < 2 * d + 1; i++) {
-				*(trace + d * (maxop + 1) + i) = vertices[i - d];
+				*(trace + d * (2 * maxop + 1) + i) = vertices[i - d];
 			}
 
 			if(xend >= d1->noe && yend >= d2->noe) {
