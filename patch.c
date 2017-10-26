@@ -42,7 +42,6 @@ int main(int argc, char *argv[]) {
 						else {
 							flag = 1;
 							lsnum[m] = '\0';
-					        //printf("%s\n", lsnum);
 							d[x].start = atoi(lsnum);
 							m = 0;
 						}
@@ -50,7 +49,6 @@ int main(int argc, char *argv[]) {
 					}
 					if(flag == 1) {
 						lsnum[m] = '\0';
-					    //printf("flag %s\n", lsnum);
 						d[x].end = atoi(lsnum);
 						m = 0;
 						flag = 0;
@@ -61,8 +59,6 @@ int main(int argc, char *argv[]) {
 						d[x].end = d[x].start;
 						m = 0;
 					}
-				    printf("start %d\n", d[x].start);
-					printf("end %d\n", d[x].end);
 					x++;
 					k = 0;
 					break;
@@ -70,7 +66,6 @@ int main(int argc, char *argv[]) {
 				else if(plines[i][j] == 'a') {
 					str[k] = '\0';
 					a[y].index = atoi(str);
-					printf("index %d\n", a[y].index);
 					k = 0;
 					for(j = j + 1; plines[i][j]; j++) {
 						if(plines[i][j] != ',') {
@@ -102,8 +97,6 @@ int main(int argc, char *argv[]) {
 						a[y].start = i + 2;
 						a[y].end = end - start + i + 2;
 					}
-					printf("start %d\n", a[y].start);
-					printf("end %d\n", a[y].end);
 					y++;
 					break;
 				}
