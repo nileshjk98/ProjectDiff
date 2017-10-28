@@ -45,7 +45,6 @@ int main(int argc, char *argv[]) {
 							d[x].start = atoi(lsnum);
 							m = 0;
 						}
-							
 					}
 					if(flag == 1) {
 						lsnum[m] = '\0';
@@ -114,25 +113,30 @@ int main(int argc, char *argv[]) {
 		}
 		y++;
 	}
-	for(i = 0; i < fnol; i++) {
-		if(i == a[y].index - 1) {
-			for(j = a[y].start - 1; j < a[y].end; j++) {
-				final[f] = (char *)malloc(strlen(plines[j] + 1));
-				strcpy(final[f], &plines[j][2]); 
+	for(i = 1; i <= fnol; i++) {
+		if(!(i >= d[x].start && i <= d[x].end)) {
+			final[f] = (char *)malloc(strlen(flines[i - 1]) + 1);
+			strcpy(final[f], flines[i - 1]); 
+			f++;
+		
+		}
+		if(i == a[y].index) {
+			for(j = a[y].start; j <= a[y].end; j++) {
+				final[f] = (char *)malloc(strlen(plines[j - 1] + 1));
+				strcpy(final[f], &plines[j - 1][2]); 
 				f++;
 			}
-		}
-		if(!(i >= d[x].start - 1 && i < d[x].end)) {
-			final[f] = (char *)malloc(strlen(flines[i]) + 1);
-			strcpy(final[f], flines[i]); 
-			f++;
-		}
-		if(i >= d[x].end) 
-			x++;
-		if(i >= a[y].index) 
 			y++;
+		}
+		if(i > d[x].end) {
+			x++;
+		}
+		if(i > a[y].index) {
+			y++;
+		}
 	}
 	i = 0;
+	printf("patching file %s\n", argv[1]);
 	fd = open(argv[1], O_TRUNC | O_CREAT | O_WRONLY);
 	while(i < f) {
 		for(j = 0; final[i][j]; j++) {
