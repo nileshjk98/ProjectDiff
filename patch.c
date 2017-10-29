@@ -5,23 +5,67 @@
 #include<sys/stat.h>
 #include<fcntl.h>
 #include<unistd.h>
+
+/* This function separates lines of the given file
+ */
 int lineseparator(char *filename, char **lines); 
 int main(int argc, char *argv[]) {
-	int fd, i = 0, fnol, pnol, flag = 0, x = 0, y = 0, start, end, f = 0, k, j = 0, m = 0;
+	int fd1, fd2, fd, i = 0, fnol, pnol, flag = 0, x = 0, y = 0, start, end, f = 0, k, j = 0, m = 0, flaglg = 0, flagda = 0;
 	char *flines[1024], *plines[1024], str[32], *final[1024], lsnum[32], lenum[32];
-	typedef struct dellines {
-		int start;
-		int end;
+	typedef struct dellines { // This structure stores the information of line numbers to be deleted from first file
+		int start; // Beginning of hunk of lines to be deleted
+		int end; // End of hunk of lines to be deleted
 	}dellines;
-	typedef	struct appendat {
-		int index;
-		int start;
-		int end;
+	typedef	struct appendat { // This structure stores the information of line numbers to be inserted from second file
+		int index; // Index at which hunk of lines from second file is to be inserted
+		int start; // Starting index of lines to be inserted from second file
+		int end; // End index of lines to be inserted from second file
 	}appendat;
 	dellines d[60];
 	appendat a[60];
+	fd1 = open(argv[2], O_RDONLY);
+	fd2 = open(argv[1], O_RDONLY);
+
+	// Error checking
+	
+	if(argc < 3) {
+		printf("mypatch: missing operand\n");
+		exit(-1);
+	}
+	else if(fd1 == -1) {
+		printf("mypatch: **** Can't open patch file %s : No such file or directory\n", argv[2]);	
+		exit(-1);
+	}
+	else if(fd2 == -1) {
+		printf("mypatch: **** %s : No such file or directory\n", argv[1]);
+		exit(-1);
+	}
+	close(fd1);
+	close(fd2);
 	fnol = lineseparator(argv[1], flines);
 	pnol = lineseparator(argv[2], plines);
+	for(i = 0; i < pnol; i++) {
+		if(plines[i][0] == '>' || plines[i][0] == '<') {
+			flaglg = 1;
+		}
+		else {
+			flagda = 1;
+			for(j = 0; plines[i][j] && plines[i][j] >= '0' && plines[i][j] <= '9'; j++);
+			if(plines[i][j] != 'a' && plines[i][j] != 'd' && plines[i][j] != ',') {
+				printf("mypatch: **** Only garbage was found in patch input\n");
+				exit(-1);
+			}
+		}
+	}
+	if(flaglg != 1) {
+		printf("mypatch: **** Only garbage was found in patch input\n");
+		exit(-1);
+	}
+	if(flagda != 1) {
+		printf("mypatch: **** Only garbage was found in patch input\n");
+		exit(-1);
+	}
+	j = 0;
 	for(i = 0; i < pnol; i++) {
 		k = 0;
 		if(plines[i][0] == '<' || plines[i][0] == '>') {
@@ -147,6 +191,7 @@ int main(int argc, char *argv[]) {
 	}
 	close(fd);
 }
+
 int lineseparator(char *filename, char **lines) {
 	int m, i = 0, j = 0, fd;
 	char ch, templine[1024];
