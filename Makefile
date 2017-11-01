@@ -1,6 +1,6 @@
-all: mydiff patch
-mydiff: fbasicdiff.o fmyers.o ignoreopt.o dir.o sbs.o context.o 
-	cc fbasicdiff.o fmyers.o ignoreopt.o dir.o sbs.o context.o -o mydiff
+all: project patch
+project: fbasicdiff.o fmyers.o ignoreopt.o dir.o sbs.o context.o 
+	cc fbasicdiff.o fmyers.o ignoreopt.o dir.o sbs.o context.o -o project
 fbasicdiff.o: fbasicdiff.c diff.h
 	cc -c fbasicdiff.c
 fmyers.o: fmyers.c diff.h
