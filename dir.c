@@ -196,11 +196,6 @@ void dirbacktrack(int maxop, int x, int y, int d, int *trace, dir1* d1, dir2* d2
 	}
 	normaldirdiff(d1, d2);
 }
-/*int cmp(const void *e1, const void *e2) {
-	const char *e11 = *(const char **)e1;
-	const char *e22 = *(const char **)e2;
-    return strcmp(e11, e22);
-}*/
 /*
  * This function uses graph search to find minimum number of edits i.e 
  * insertions and deletions required to convert directory1 to directory2. 
@@ -212,8 +207,6 @@ int dirshortestpath(dir1* d1, dir2* d2) {
 	int *vertices, *trace, *temp;
 	trace = (int *)malloc(sizeof(int) * (maxop + 1) * (2 * maxop + 1));
 	temp = (int *)malloc((2 * maxop + 1) * sizeof(int));
-	//qsort(d1->names, 1024, sizeof(char *), cmp);
-	//qsort(d2->names, 1024, sizeof(char *), cmp);
 	for(i = 0; i < 2 * maxop + 1; i++) {
 		temp[i] = 0;
 	}
