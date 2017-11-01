@@ -1,6 +1,19 @@
 1. Myer's Paper : http://www.xmailserver.org/diff2.pdf
-2. Man page of diff, getopt, opendir
+   This contains the basic algorithm for diff and psuedo code to find shortest edit path to convert file1 to file2.
+
+2. Man page of diff, getopt, opendir, readdir
+   I referred this to understand the working of diff command, getopt function, opendir function and readdir function.
+
 3. Diff Documentation : www.gnu.org/software/diffutils/manual/diffutils.html
+   I referred this to understand the meaning of different output formats.
+
 4. The If Works : https://blog.jcoglan.com/2017/02/12/the-myers-diff-algorithm-part-1/
+   This blog contains easier explanation of Myer's diff algorithm which helped me to understand its working. It also explains 
+   concept of backtracking to find the shortest path.
+
 5. Codeproject : https://www.codeproject.com/Articles/42279/Investigating-Myers-diff-algorithm-Part-of
+   This contains the basic algorithm for diff and an implementation shortest edit path to convert file1 to file2.
+
 6. Diff utility - Wikipedia : https://en.wikipedia.org/wiki/Diff_utility
+   This has information about various algorithms for diff which helped me to decide which one to implement.
+
