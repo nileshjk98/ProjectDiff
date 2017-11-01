@@ -8,7 +8,8 @@ code works for files with number of lines upto 2048. The number of lines can
 be increased at the cost of space required for the program. The output produced
 using normal diff(without any options) can be used to directly to patch the
 file1 using linux patch command. I have also impemented patch command which can
-used for the same purpose.
+used for the same purpose. For binary files, it states that files differ if the 
+two input files are different, otherwise there is no output.
 The options for which the code works are:
 -r : recursive directory comparison
 -c : context format output
