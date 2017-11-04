@@ -202,7 +202,7 @@ void dirbacktrack(int maxop, int x, int y, int d, int *trace, dir1* d1, dir2* d2
  *
  */
 int dirshortestpath(dir1* d1, dir2* d2) {
-	int d, i, k, x, y, result, j;
+	int d, i, k, result;
 	int maxop = d1->noe + d2->noe;
 	int *vertices, *trace, *temp;
 	trace = (int *)malloc(sizeof(int) * (maxop + 1) * (2 * maxop + 1));

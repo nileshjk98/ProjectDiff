@@ -11,7 +11,7 @@
 int lineseparator(char *filename, char **lines); 
 int main(int argc, char *argv[]) {
 	int fd1, fd2, fd, i = 0, fnol, pnol, flag = 0, x = 0, y = 0, start, end, f = 0, k, j = 0, m = 0, flaglg = 0, flagda = 0;
-	char *flines[1024], *plines[1024], str[32], *final[1024], lsnum[32], lenum[32];
+	char *flines[1024], *plines[1024], str[32], *final[1024], lsnum[32];
 	typedef struct dellines { // This structure stores the information of line numbers to be deleted from first file
 		int start; // Beginning of hunk of lines to be deleted
 		int end; // End of hunk of lines to be deleted
