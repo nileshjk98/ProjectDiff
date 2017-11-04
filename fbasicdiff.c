@@ -39,7 +39,7 @@
  */
 
 int main(int argc, char * const argv[]) {
-	int i = 0, j = 0, m, n, d, count = 0, flag = 0, flags = 0;
+	int flag = 0, flags = 0, d;
 	file1 f1;
 	file2 f2;
 	dir1 d1;
@@ -95,6 +95,12 @@ int main(int argc, char * const argv[]) {
 	d1.dirname = argv[argc - 2];
 	d1.dd = opendir(d1.dirname);
 	if(d1.dd == NULL) {
+		d2.dirname = argv[argc - 1];
+		d2.dd = opendir(d2.dirname);
+		if(d2.dd != NULL) {
+			printf("mydiff: %s: Not a file", d2.dirname);
+			exit(-1);
+		}
 		f1.filename = argv[argc - 2];
 		f2.filename = argv[argc - 1];
 		f1.fd = open(f1.filename, O_RDONLY);
@@ -136,7 +142,7 @@ int main(int argc, char * const argv[]) {
 		d2.dirname = argv[argc - 1];
 		d2.dd = opendir(d2.dirname);
 		if(d2.dd == NULL) { 
-			perror("");
+			printf("mydiff: %s: Not a directory\n", d2.dirname);
 			return errno;
 		}
 		recdirdiff(&d1, &d2);
