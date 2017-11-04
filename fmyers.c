@@ -10,7 +10,7 @@
  */
 void backtrack(int maxop, int x, int y, int d, int *trace, file1* f1, file2* f2) {
 	int prevx, prevy, prevk;
-	int k, i = d, *vertices, j = 0;
+	int k, i = d, *vertices, j = 0, s = 0, t = 0;
 	f1->dellines = (int *)calloc(f1->nol, sizeof(int));
 	if(f1->dellines == NULL) {
 		printf("calloc failed\n");
@@ -76,10 +76,10 @@ void backtrack(int maxop, int x, int y, int d, int *trace, file1* f1, file2* f2)
  *
  */
 int shortestpath(file1* f1, file2* f2) {
-	int d, i, k, result;
+	int d, i, k, x, y, result, j;
 	int maxop = f1->nol + f2->nol;
 	int *vertices, *trace, *temp;
-	int dmove, kprev, x, y, xend, yend;
+	int dmove, kprev, xstart, ystart, xend, yend;
 	trace = (int *)malloc(sizeof(int) * (maxop + 1) * (2 * maxop + 1));
 	if(ignore_case == true) 
 		ignorecase(f1, f2);
@@ -98,17 +98,16 @@ int shortestpath(file1* f1, file2* f2) {
 	for(d = 0; d <= maxop; d++) {
 		for(k = -d; k <= d; k += 2) {
 			if(k == -d) 
-				dmove = 1; //downward move i.e. insertion
+				dmove = 1;
 			else if(k != d && vertices[k - 1] < vertices[k + 1]) 
-				dmove = 1; 
+				dmove = 1;
 			else 
-				dmove = 0; //rightward move i.e. deletion
-			kprev = dmove ? k + 1 : k - 1; //if downward move is made then k decreases by 1 i.e kprev is k + 1 else k increases by 1 as k = x - y
-			x = vertices[kprev]; //stored x value in previous iteration assigned to current x
-			y = x - kprev;
-			xend = dmove ? x : x + 1; //if dmove is made xend remains same else it increases by 1
+				dmove = 0;
+			kprev = dmove ? k + 1 : k - 1;
+			xstart = vertices[kprev];
+			ystart = xstart - kprev;
+			xend = dmove ? xstart : xstart + 1;
 			yend = xend - k;
-			//diagonal move in case lines are same
 			while(xend < f1->nol && yend < f2->nol && (result = strcmp(f1->lines[xend], f2->lines[yend]) == 0)) {
 				xend++;
 				yend++;
@@ -116,7 +115,6 @@ int shortestpath(file1* f1, file2* f2) {
 			vertices[k] = xend;
 
 			for(i = 0; i < 2 * d + 1; i++) {
-				//trace array stores the values of x at the end of each iteration for backtracking
 				*(trace + d * (2 * maxop + 1) + i) = vertices[i - d];
 			}
 			if(xend >= f1->nol && yend >= f2->nol) {
@@ -136,11 +134,9 @@ int shortestpath(file1* f1, file2* f2) {
 
 void normaldiff(file1 *f1, file2 *f2) {
 	int i = 0, j, k = 0, l, temp;
-	//lineseparator called again to remove the effect of options on the lines
 	lineseparator(f1->filename, f1->lines);
 	lineseparator(f2->filename, f2->lines);
 	for(i = 0; i <= f1->nol; i++) {
-		//lines to be deleted
 		if(i != f1->nol && f1->dellines[i] == 1) {
 			j = i;
 			while(j < f1->nol && f1->dellines[j] == 1) {
@@ -155,7 +151,6 @@ void normaldiff(file1 *f1, file2 *f2) {
 			}
 			i--;
 		}
-		//lines to be appended
 		if(f1->inslines[i] > 0) {
 			for(; k < f2->nol; k++) {
 				if(f2->toinslines[k] == 1) {
