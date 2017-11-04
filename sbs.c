@@ -10,7 +10,7 @@
  *
  */
 void side_by_side(file1 *f1, file2 *f2) {
-	int i = 0, j, k = 0, l, temp, m = 0;
+	int i = 0, j, k = 0, l, temp;
 	lineseparator(f1->filename, f1->lines);
 	lineseparator(f2->filename, f2->lines);
 	expandtabs(f1, f2);

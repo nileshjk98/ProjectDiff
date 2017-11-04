@@ -1,6 +1,6 @@
 all: project patch
 project: fbasicdiff.o fmyers.o ignoreopt.o dir.o sbs.o context.o 
-	cc fbasicdiff.o fmyers.o ignoreopt.o dir.o sbs.o context.o -o project
+	cc -Wall fbasicdiff.o fmyers.o ignoreopt.o dir.o sbs.o context.o -o project
 fbasicdiff.o: fbasicdiff.c diff.h
 	cc -c fbasicdiff.c
 fmyers.o: fmyers.c diff.h
@@ -14,6 +14,6 @@ sbs.o: sbs.c diff.h
 context.o: context.c diff.h
 	cc -c context.c
 patch: patch.c
-	cc patch.c -o patch
+	cc -Wall patch.c -o patch
 clean: 
 	rm *.o

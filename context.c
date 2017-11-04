@@ -9,7 +9,7 @@
  */
 
 void contextformat(file1 *f1, file2 *f2) {
-	int i = 0, j = 0, count = 0, k = 0, flag = 0, l = 0, x = 0;
+	int i = 0, j = 0, count = 0, k = 0, flag = 0;
 	struct stat attrib;
 	stat(f1->filename, &attrib);
 	char time[100];
